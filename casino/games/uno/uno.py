@@ -112,7 +112,6 @@ def play_uno(ctx: GameContext) -> None:
         while (answer != "d" and answer != "p" and answer != "draw" and answer != "play"):
             cprint("Please input either P or D!")
             answer = cinput(DRAW_PROMPT).lower()
-
         if (answer == "d" or answer == "draw") :
             new_card = i.draw(current_deck)
             cprint("You drew \n" + str(new_card) + " from the pile.")
@@ -143,10 +142,21 @@ def play_uno(ctx: GameContext) -> None:
                     if len(played_card_words) == 1:
                         if played_card_words[0] == "+4":
                             new_card = UnoCard("wild","wild_draw_4")
+                            # A wild +4 card has been played.
+                            i.plus4_cards += 1
                         else:
                             new_card = UnoCard("wild","wild")
+                            # A wild card has been played.
+                            i.wild_cards += 1
                     else: 
                         new_card = UnoCard(played_card_words[0],played_card_words[1])
+                        # Need to keep track of what kinds of cards are played.
+                        if(played_card_words[1] == "draw_2"):
+                            i.plus2_cards += 1
+                        elif(played_card_words[1] == "skip"):
+                            i.skip_cards += 1
+                        elif(played_card_words[1] == "reverse"):
+                            i.reverse_cards += 1
 
                     if not (new_card in i.playable_cards(current_card)):
                         valid_card = False
@@ -163,6 +173,20 @@ def play_uno(ctx: GameContext) -> None:
                 continueGame = False
                 display_uno_topbar(ctx)
                 cprint(f"{i.name} is the winner!")
+                cprint("\n")
+                cprint("-----Game Statistics-----\n")
+                cprint("Number of cards played/drawn:")
+                cprint(i.draws)
+                cprint("Number of +2 cards played:")
+                cprint(i.plus2_cards)
+                cprint("Number of +4 cards played:")
+                cprint(i.plus4_cards)
+                cprint("Number of reverse cards played:")
+                cprint(i.reverse_cards)
+                cprint("Number of skip cards played:")
+                cprint(i.skip_cards)
+                cprint("Number of wild cards played:")
+                cprint(i.wild_cards)
                 cinput("Press enter when ready to exit")
                 break
             match new_card.rank:
